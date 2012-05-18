@@ -15,6 +15,12 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        FolderBackupUI mainWindow = new FolderBackupUI();
+        mainWindow.setVisible(true);
+        
+        VernaFolder rawr = new VernaFolder("C:\\Users\\Sweord\\Documents\\Archived");
+        rawr.reloadFileSet();
+        //rawr.outputFilenames();
         
     }
 
