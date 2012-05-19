@@ -8,14 +8,13 @@
  *
  * Created on May 18, 2012, 1:24:46 PM
  */
-
 package folderautobackuputility;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 
 /**
  *
@@ -23,9 +22,25 @@ import javax.swing.JFormattedTextField;
  */
 public class FolderBackupUI extends javax.swing.JFrame {
 
+    final static long serialVersionUID = 124891l;
+    static String FOLDER_CONFIG = "folders.cfg";
+    File folderConfigFile = null;
+
     /** Creates new form FolderBackupUI */
     public FolderBackupUI() {
         initComponents();
+
+        try {
+            folderConfigFile = new File(FOLDER_CONFIG);
+            if (folderConfigFile.canRead() != true) {
+                folderConfigFile.createNewFile();
+
+            }
+            
+        } catch (Exception ex) {
+            Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     /** This method is called from within the constructor to
@@ -97,15 +112,17 @@ public class FolderBackupUI extends javax.swing.JFrame {
 
     private void AddFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddFolderButtonActionPerformed
         // TODO add your handling code here:
-        if(VernaFolderList == null) VernaFolderList = new DefaultListModel();
+        if (VernaFolderList == null) {
+            VernaFolderList = new DefaultListModel();
+        }
         JFileChooser rawr = new JFileChooser();
         rawr.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         rawr.showDialog(this, "Open");
 
         VernaFolder folderToAdd = null;
         folderToAdd = new VernaFolder(rawr.getSelectedFile());
-        
-        if(folderToAdd != null) {
+
+        if (folderToAdd != null) {
             folderToAdd.reloadFileSet();
             VernaFolderList.addElement(folderToAdd);
         }
@@ -115,25 +132,27 @@ public class FolderBackupUI extends javax.swing.JFrame {
 
     private void ShowFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowFolderButtonActionPerformed
         // TODO add your handling code here:
+        VernaFolder folderInQuestion = (VernaFolder) folderList.getSelectedValue();
+        FolderBackupStatus statusScreen = new FolderBackupStatus(folderInQuestion);
+        statusScreen.setVisible(true);
     }//GEN-LAST:event_ShowFolderButtonActionPerformed
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             public void run() {
                 new FolderBackupUI().setVisible(true);
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddFolderButton;
     private javax.swing.JButton ShowFolderButton;
     private javax.swing.JList folderList;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
-
     private DefaultListModel VernaFolderList;
 }

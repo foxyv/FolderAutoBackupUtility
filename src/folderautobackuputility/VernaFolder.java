@@ -18,10 +18,23 @@ import java.util.logging.Logger;
 public class VernaFolder {
 
     private HashSet<URI> fileSet;
+    private HashSet<VernaFolder> subFolders;
 
+    public HashSet<VernaFolder> getSubFolders() {
+        return subFolders;
+    }
 
     private URI FolderURI;
     private String FolderName;
+
+    public void loadSubfolders(){
+        File tempFile;
+        if(subFolders == null) subFolders = new HashSet<VernaFolder>();
+        for(URI fileURI : fileSet){
+            tempFile = new File(fileURI);
+            if(tempFile.isDirectory()) subFolders.add(new VernaFolder(tempFile));
+        }
+    }
 
     VernaFolder(File selectedFile) {
         try {
@@ -143,8 +156,6 @@ public class VernaFolder {
 
     @Override
     public String toString() {
-        super.toString();
-        System.out.println("To String: " + FolderName);
         return FolderName;
     }
 

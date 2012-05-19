@@ -18,10 +18,6 @@ public class Main {
         FolderBackupUI mainWindow = new FolderBackupUI();
         mainWindow.setVisible(true);
         
-        VernaFolder rawr = new VernaFolder("C:\\Users\\Sweord\\Documents\\Archived");
-        rawr.reloadFileSet();
-        //rawr.outputFilenames();
-        
     }
 
 }

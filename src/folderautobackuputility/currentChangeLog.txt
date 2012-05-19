@@ -1,0 +1,10 @@
+-=-=-=-=  FolderBackupUI.java   -=-=-=-=-=
+The "Show Folder Status" actionPressed event now creates a new status window for the folder selected in the folderList.
+
+
+-=-=-=-=  FolderBackupStatus.Java   -=-=-=-=-=
+Added constructor which can accept a VernaFolder object.
+Added a caption which automatically changes to the folder's name.
+Added a sorted list of files within the directory.
+
+NOTE: Need a browser of sorts so we can cover subdirectories. Perhaps a folderBrowser class and a tree for the display instead of a list.
