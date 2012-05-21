@@ -124,9 +124,11 @@ public class VernaFolder {
     public VernaFolder(String FolderPath) {
         try {
             //System.out.println("Loading File");
+            
+            URI folderURI = new URI(FolderPath);
             File tempFile;
 
-            tempFile = new File(FolderPath);
+            tempFile = new File(folderURI);
             
             if (tempFile.isDirectory()) {
                 System.out.println("Converting to URI and storing folder path");

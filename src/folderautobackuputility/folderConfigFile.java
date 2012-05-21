@@ -4,13 +4,7 @@
  */
 package folderautobackuputility;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -25,6 +19,14 @@ public class folderConfigFile extends File {
     final static long serialVersionUID = 564546564l;
     ArrayList<VernaFolder> folders;
 
+    public ArrayList<VernaFolder> getFolders() {
+        return folders;
+    }
+
+    public boolean addFolder(VernaFolder e) {
+        return folders.add(e);
+    }
+
     public void readFolders() {
         BufferedReader readConfig = null;
         String tempLine;
@@ -33,8 +35,9 @@ public class folderConfigFile extends File {
         try {
             //Check to make sure the file exists if it doesn't exit the method
             if (folders == null) {
-                return;
+                folders = new ArrayList<VernaFolder>();
             }
+
 
             //Load up the BufferedReader for the file
             readConfig = new BufferedReader(new FileReader(this));
@@ -48,15 +51,21 @@ public class folderConfigFile extends File {
                 if (tempLine.startsWith("folder:") && (tempLine.isEmpty() != true)) {
 
                     //Remove the folder prefix from the temporary string
-                    tempLine.replace("folder:", "");
+                    tempLine = tempLine.substring(7, tempLine.length());
 
+                    System.out.println(tempLine);
+                    
                     //Make a new file with the temporary string
-                    tempFile = new File(tempLine);
+                    
+                    tempFile = new File(new URI(tempLine));
 
                     //Check to make sure the file exists and is in fact a directory
                     if (tempFile.canRead() && tempFile.isDirectory()) {
                         //Add the directory to the folder list
+                        System.out.println("Folder Read!");
                         folders.add(new VernaFolder(tempFile));
+                    }
+                    else{
                     }
                 }
             }
@@ -77,26 +86,30 @@ public class folderConfigFile extends File {
         }//end of finally
     } //End of method
 
-    public void writeToFolderConfig(VernaFolder aFolder) {
+    public void writeToFolderConfig() {
+        //TODO: Finish
         //Load up the BufferedReader for the file
         BufferedWriter writeConfig = null;
         try {
-            BufferedWriter readConfig = null;
-            writeConfig = new //Load up the BufferedReader for the file
-            BufferedWriter(new FileWriter(this));
+            writeConfig = new BufferedWriter(new FileWriter(this));//Load up the BufferedReader for the file
+            for(VernaFolder aVernaFolder : folders){
+                writeConfig.append("folder:" + aVernaFolder.getFolderURI().toString());
+            }          
             
-        }
+
+        } 
+        
+        
         catch (Exception ex) {
             Logger.getLogger(folderConfigFile.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally {
+        } finally {
 
             try {
                 writeConfig.close();
             } catch (IOException ex) {
                 Logger.getLogger(folderConfigFile.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
 
     }
