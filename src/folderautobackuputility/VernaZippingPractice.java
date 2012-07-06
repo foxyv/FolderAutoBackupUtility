@@ -6,6 +6,7 @@
 package folderautobackuputility;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author Sweord
  */
-public class VernaZippingPractice {
+public class VernaZippingPractice implements Serializable {
 
     private ZipOutputStream archive;
     LinkedList<ZipEntry> entries;

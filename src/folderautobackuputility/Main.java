@@ -18,6 +18,11 @@ public class Main {
         FolderBackupUI mainWindow = new FolderBackupUI();
         mainWindow.setVisible(true);
         
+        
+        
+    }
+
+    private Main() {
     }
 
 }

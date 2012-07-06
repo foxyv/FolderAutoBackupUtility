@@ -22,18 +22,15 @@ public class FolderBackupUI extends javax.swing.JFrame {
 
     final static long serialVersionUID = 124891l;
     static String FOLDER_CONFIG = "folders.cfg";
-    folderConfigFile config = null;
+    FolderInformationFile config = null;
 
     /**
      * Creates new form FolderBackupUI
      */
     public FolderBackupUI() {
         initComponents();
-        
         reloadFolderList();
-
-
-
+        
     }
 
     /**
@@ -81,8 +78,8 @@ public class FolderBackupUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ShowFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
-                    .addComponent(AddFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
+                    .addComponent(ShowFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(AddFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -130,7 +127,7 @@ public class FolderBackupUI extends javax.swing.JFrame {
         config.addFolder(folderToAdd);
         
         //Update the config file
-        config.writeToFolderConfig();
+        config.writeToFile();
 
         //Make sure the model for folderList is folderListModel
         folderList.setModel(folderListModel);
@@ -167,7 +164,7 @@ public class FolderBackupUI extends javax.swing.JFrame {
     private void reloadFolderList() {
         try {
             //Initialize config
-            config = new folderConfigFile(FOLDER_CONFIG);
+            config = new FolderInformationFile(FOLDER_CONFIG);
             
             //Check to make sure config exists and make a new file if it doesn't
             if (config.canRead() != true) {
@@ -175,7 +172,7 @@ public class FolderBackupUI extends javax.swing.JFrame {
             }
             
             //Initialize the folder list in config
-            config.readFolders();
+            config.readFromFile();
             
             //Initialize folderListModel
             folderListModel = new SortedListModel();

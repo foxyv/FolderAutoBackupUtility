@@ -4,8 +4,8 @@
  */
 package folderautobackuputility;
 
-import java.awt.Component;
 import java.io.File;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -15,10 +15,12 @@ import java.util.logging.Logger;
  * A class that will take a folder path and store the locations of all of the files within and subfolders.
  * @author Sweord
  */
-public class VernaFolder {
+public class VernaFolder implements Serializable {
 
     private HashSet<URI> fileSet;
+    private HashSet<URI> ignoreFiles;
     private HashSet<VernaFolder> subFolders;
+    
 
     public HashSet<VernaFolder> getSubFolders() {
         return subFolders;
@@ -27,14 +29,6 @@ public class VernaFolder {
     private URI FolderURI;
     private String FolderName;
 
-    public void loadSubfolders(){
-        File tempFile;
-        if(subFolders == null) subFolders = new HashSet<VernaFolder>();
-        for(URI fileURI : fileSet){
-            tempFile = new File(fileURI);
-            if(tempFile.isDirectory()) subFolders.add(new VernaFolder(tempFile));
-        }
-    }
 
     VernaFolder(File selectedFile) {
         try {
@@ -78,12 +72,12 @@ public class VernaFolder {
      * Sets the folders describing string. This does not have to be unique.
      * @param FolderName
      */
-    public void setFolderName(String FolderName) {
+    public final void setFolderName(String FolderName) {
         this.FolderName = FolderName;
     }
 
     /**
-     * Get's the folder's current URI.
+     * Gets the folder's current URI.
      * @return
      */
     public URI getFolderURI() {
@@ -94,15 +88,13 @@ public class VernaFolder {
         String line = "";
         fileSet = new HashSet<URI>();
         try {
-            System.out.println("ReloadFileSet!");
-            System.out.println("Converting URI to FILE");
             File currentFolder = new File(FolderURI);
 
-            File[] fileList = null;
+            File[] fileList;
             if (currentFolder.isDirectory()) {
                 //System.out.println("Loading filelist into File array");
                 fileList = currentFolder.listFiles();
-                URI tempURI = null;
+                URI tempURI;
                 for (File subfile : fileList) {
                     //System.out.println("Converting Files to URIs");
                     
@@ -155,12 +147,20 @@ public class VernaFolder {
             System.out.println(rawr.toString());
         }
     }
+    
+    public void addIgnoreFile(File aFile){
+        if(ignoreFiles == null) ignoreFiles = new HashSet<URI>();
+        ignoreFiles.add(aFile.toURI());
+    }
 
     @Override
     public String toString() {
         return FolderName;
     }
+    
 
 
+
+    private static String endl = "\n"; //LOL C++
     
 }
