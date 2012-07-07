@@ -8,7 +8,7 @@ package folderautobackuputility;
 import java.util.Comparator;
 
 /**
- *
+ * Compares two objects using their toString() methods.
  * @author Sweord
  */
 public class ObjectToStringComparator implements Comparator<Object>{
@@ -17,5 +17,6 @@ public class ObjectToStringComparator implements Comparator<Object>{
         return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
         
     }
+    
 
 }

@@ -137,7 +137,7 @@ public class FolderBackupUI extends javax.swing.JFrame {
     private void ShowFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowFolderButtonActionPerformed
         // TODO add your handling code here:
         VernaFolder folderInQuestion = (VernaFolder) folderList.getSelectedValue();
-        FolderBackupStatus statusScreen = new FolderBackupStatus(folderInQuestion);
+        FolderBackupInfo statusScreen = new FolderBackupInfo(folderInQuestion);
         statusScreen.setVisible(true);
     }//GEN-LAST:event_ShowFolderButtonActionPerformed
 

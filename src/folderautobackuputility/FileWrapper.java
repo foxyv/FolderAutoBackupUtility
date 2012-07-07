@@ -9,7 +9,7 @@ import java.io.File;
 import java.net.URI;
 
 /**
- *
+ * A File with a different toString method that will return it's name instead of a full path.
  * @author Sweord
  */
 public class FileWrapper extends File{

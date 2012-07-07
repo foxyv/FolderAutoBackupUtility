@@ -4,7 +4,7 @@
  */
 
 /*
- * FolderBackupStatus.java
+ * FolderBackupInfo.java
  *
  * Created on May 18, 2012, 1:26:36 PM
  */
@@ -13,19 +13,19 @@ package folderautobackuputility;
 import java.net.URI;
 
 /**
- *
+ * A small dialog showing the current backup status of a folder.
  * @author Sweord
  */
-public class FolderBackupStatus extends javax.swing.JFrame {
+public class FolderBackupInfo extends javax.swing.JFrame {
 
     /**
-     * Creates new form FolderBackupStatus
+     * Creates new form FolderBackupInfo
      */
-    public FolderBackupStatus() {
+    public FolderBackupInfo() {
         initComponents();
     }
 
-    public FolderBackupStatus(VernaFolder aFolder) {
+    public FolderBackupInfo(VernaFolder aFolder) {
         initComponents();
         theFolder = aFolder;
         jLabel1.setText(theFolder.getFolderName());
@@ -105,7 +105,7 @@ public class FolderBackupStatus extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new FolderBackupStatus().setVisible(true);
+                new FolderBackupInfo().setVisible(true);
             }
         });
     }

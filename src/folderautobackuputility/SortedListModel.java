@@ -5,8 +5,10 @@
 
 package folderautobackuputility;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.DefaultListModel;
 
 /**
@@ -20,10 +22,9 @@ public class SortedListModel extends DefaultListModel {
     }
 
     public void sortByString(){
-        LinkedList<Object> tempObjectList = new LinkedList<Object>();
-        for(int x = 0; x < this.getSize(); x++){
-            tempObjectList.add(this.get(x));
-        }
+        
+        List tempObjectList = Arrays.asList(this.toArray());
+        
         ObjectToStringComparator OTSC = new ObjectToStringComparator();
         Collections.sort(tempObjectList, OTSC);
         this.clear();
