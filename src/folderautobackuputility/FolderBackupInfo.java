@@ -10,10 +10,15 @@
  */
 package folderautobackuputility;
 
-import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
 /**
  * A small dialog showing the current backup status of a folder.
+ *
  * @author Sweord
  */
 public class FolderBackupInfo extends javax.swing.JFrame {
@@ -23,12 +28,16 @@ public class FolderBackupInfo extends javax.swing.JFrame {
      */
     public FolderBackupInfo() {
         initComponents();
+        
     }
 
     public FolderBackupInfo(VernaFolder aFolder) {
         initComponents();
+        this.setTitle(aFolder.getFolderName() + " backup information.");
         theFolder = aFolder;
-        jLabel1.setText(theFolder.getFolderName());
+        if (theFolder != null) {
+            jLabel1.setText(theFolder.getFolderName());
+        }
     }
 
     /**
@@ -42,7 +51,7 @@ public class FolderBackupInfo extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        jTree1 = new javax.swing.JTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -55,17 +64,21 @@ public class FolderBackupInfo extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("jLabel1");
 
-        jScrollPane1.setViewportView(jList1);
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Populating Tree");
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jScrollPane1.setViewportView(jTree1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -73,8 +86,8 @@ public class FolderBackupInfo extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -83,17 +96,27 @@ public class FolderBackupInfo extends javax.swing.JFrame {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
-        if (FileListModel == null) {
-            FileListModel = new SortedListModel();
-        }
+
+
         if (theFolder != null) {
-            for (URI file : theFolder.getFileSet()) {
-                FileWrapper tempFile = new FileWrapper(file);
-                FileListModel.addElement(tempFile);
+            theFoldersTree = new FolderTree(theFolder);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FolderBackupInfo.class.getName()).log(Level.SEVERE, null, ex);
             }
+            jTree1.setModel(theFoldersTree.FolderTreeModel);
+
+        } else {
+            TreeNode blank = new DefaultMutableTreeNode("No Folder Given!");
+            
+            jTree1.setModel(new DefaultTreeModel(blank));
+            jLabel1.setText("No Folder");
         }
-        FileListModel.sortByString();
-        jList1.setModel(FileListModel);
+        
+
+
+
 
         System.out.println("Window Opened!");
     }//GEN-LAST:event_formWindowOpened
@@ -109,11 +132,15 @@ public class FolderBackupInfo extends javax.swing.JFrame {
             }
         });
     }
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
     private VernaFolder theFolder = null;
     private SortedListModel FileListModel;
+    FolderTree theFoldersTree;
+    
 }

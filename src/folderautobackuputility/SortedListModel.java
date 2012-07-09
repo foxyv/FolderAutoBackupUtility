@@ -5,9 +5,9 @@
 
 package folderautobackuputility;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 
@@ -23,12 +23,13 @@ public class SortedListModel extends DefaultListModel {
 
     public void sortByString(){
         
-        List tempObjectList = Arrays.asList(this.toArray());
+        ArrayList<Object> tempObjectList = (ArrayList<Object>) Arrays.asList(this.toArray());
         
         ObjectToStringComparator OTSC = new ObjectToStringComparator();
         Collections.sort(tempObjectList, OTSC);
         this.clear();
         for(Object tempObject: tempObjectList){
+            
             this.addElement(tempObject);
         }
 

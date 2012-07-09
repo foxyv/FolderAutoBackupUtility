@@ -5,6 +5,7 @@
 
 package folderautobackuputility;
 
+
 /**
  *
  * @author Sweord
@@ -17,7 +18,6 @@ public class Main {
     public static void main(String[] args) {
         FolderBackupUI mainWindow = new FolderBackupUI();
         mainWindow.setVisible(true);
-        
         
         
     }

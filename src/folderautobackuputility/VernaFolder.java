@@ -7,45 +7,35 @@ package folderautobackuputility;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A class that will take a folder path and store the locations of all of the files within and subfolders.
+ * A class that will take a folder path and store the locations of all of the
+ * files within and subfolders.
+ *
  * @author Sweord
  */
 public class VernaFolder implements Serializable {
 
-    private HashSet<URI> fileSet;
+    private LinkedList<URI> fileSet;
     private HashSet<URI> ignoreFiles;
-    private HashSet<VernaFolder> subFolders;
-    
-
-    public HashSet<VernaFolder> getSubFolders() {
-        return subFolders;
-    }
-
     private URI FolderURI;
     private String FolderName;
 
-
-    VernaFolder(File selectedFile) {
+    VernaFolder(File selectedFolder) {
         try {
-            //System.out.println("Loading File");
-            File tempFile;
 
-            tempFile = selectedFile;
-
-            if (tempFile.isDirectory()) {
-                System.out.println("Converting to URI and storing folder path");
-                FolderURI = tempFile.toURI();
-                System.out.println(tempFile.getName());
-                setFolderName(tempFile.getName());
+            if (selectedFolder.isDirectory()) {
+                FolderURI = selectedFolder.toURI();
+                setFolderName(selectedFolder.getName());
+            } else {
+                Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, selectedFolder.getName() + " is not a folder!");
             }
-
-
-            //System.out.println("Constructor done!");
 
 
         }//END OF TRY BLOCK
@@ -54,14 +44,18 @@ public class VernaFolder implements Serializable {
             Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
         }//END OF CATCH BLOCK
     }
+    
+    
 
-
-    public HashSet<URI> getFileSet() {
+    public LinkedList<URI> getFileSet() {
+        reloadFolderContents();
+        Collections.sort(fileSet,new toFileComparator());
         return fileSet;
     }
-    
+
     /**
      * Gets the current folder name/description.
+     *
      * @return
      */
     public String getFolderName() {
@@ -70,6 +64,7 @@ public class VernaFolder implements Serializable {
 
     /**
      * Sets the folders describing string. This does not have to be unique.
+     *
      * @param FolderName
      */
     public final void setFolderName(String FolderName) {
@@ -77,16 +72,17 @@ public class VernaFolder implements Serializable {
     }
 
     /**
-     * Gets the folder's current URI.
+     * Gets the folder's URI.
+     *
      * @return
      */
     public URI getFolderURI() {
         return FolderURI;
     }
 
-    public void reloadFileSet() {
-        String line = "";
-        fileSet = new HashSet<URI>();
+    public void reloadFolderContents() {
+
+        fileSet = new LinkedList<URI>();
         try {
             File currentFolder = new File(FolderURI);
 
@@ -95,33 +91,26 @@ public class VernaFolder implements Serializable {
                 //System.out.println("Loading filelist into File array");
                 fileList = currentFolder.listFiles();
                 URI tempURI;
-                for (File subfile : fileList) {
-                    //System.out.println("Converting Files to URIs");
-                    
-                    tempURI = subfile.toURI();
-                    
-                    fileSet.add(tempURI);
+                if (fileList != null) {
+                    for (File subfile : fileList) {
+                        //System.out.println("Converting Files to URIs");
+
+                        tempURI = subfile.toURI();
+
+                        fileSet.add(tempURI);
+                    }
                 }
             }
         } catch (Exception ex) {
-            System.err.println("-=-=-Error-=-=-=-=-");
-            System.err.println("Exception: " + ex);
-            System.err.println("Cause:     " + ex.getCause());
-            System.err.println("Class:     " + ex.getClass());
-            System.err.println("Line:      " + ex);
-            System.err.println("-=-=-Error-=-=-=-=-");
+            Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public VernaFolder(String FolderPath) {
         try {
-            //System.out.println("Loading File");
-            
-            URI folderURI = new URI(FolderPath);
-            File tempFile;
 
-            tempFile = new File(folderURI);
-            
+            File tempFile = new File(FolderPath);
+
             if (tempFile.isDirectory()) {
                 System.out.println("Converting to URI and storing folder path");
                 FolderURI = tempFile.toURI();
@@ -141,15 +130,16 @@ public class VernaFolder implements Serializable {
 
     }//END OF "VernaFolder" CONSTRUCTOR
 
-
     public void outputFilenames() {
         for (URI rawr : fileSet) {
             System.out.println(rawr.toString());
         }
     }
-    
-    public void addIgnoreFile(File aFile){
-        if(ignoreFiles == null) ignoreFiles = new HashSet<URI>();
+
+    public void addIgnoreFile(File aFile) {
+        if (ignoreFiles == null) {
+            ignoreFiles = new HashSet<URI>();
+        }
         ignoreFiles.add(aFile.toURI());
     }
 
@@ -157,10 +147,9 @@ public class VernaFolder implements Serializable {
     public String toString() {
         return FolderName;
     }
-    
-
-
-
     private static String endl = "\n"; //LOL C++
-    
+
+    public FileWrapper getFolderFile() {
+        return new FileWrapper(this.FolderURI.getPath());
+    }
 }

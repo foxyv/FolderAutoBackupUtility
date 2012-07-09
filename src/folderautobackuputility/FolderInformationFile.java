@@ -7,17 +7,22 @@ package folderautobackuputility;
 import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
- * A file object holding information about folders. Also has Serialization methods.
+ * A file object holding information about folders. Also has Serialization
+ * methods.
+ *
  * @author Sweord
  */
 public class FolderInformationFile extends File {
-
-    final static long serialVersionUID = 564546564l;
     
+    boolean modified = false;
+    final static long serialVersionUID = 564546564l;
     //All the folders held in the file
     ArrayList<VernaFolder> folders = new ArrayList<VernaFolder>();
 
@@ -33,16 +38,32 @@ public class FolderInformationFile extends File {
         return success;
     }
 
+    public void removeFolder(VernaFolder folderToRemove){
+        folders.remove(folderToRemove);
+    }
     //Read the folders from the file
     public void readFromFile() {
         FileInputStream FileIS = null;
         try {
-            
+
             FileIS = new FileInputStream(this);
             ObjectInputStream rawr = new ObjectInputStream(FileIS);
-            folders = (ArrayList<VernaFolder>) rawr.readObject();
             
+            Object ReadObject = rawr.readObject();
+            if(ReadObject.getClass() == ArrayList.class) {
+                    folders = new ArrayList<VernaFolder>();
+                    for(Object anObject : (ArrayList)ReadObject){
+                        if(anObject.getClass() == VernaFolder.class) folders.add((VernaFolder) anObject);
+                    }
+            }
+            else throw new Exception("Class mismatch when loading configuration file.");
+                    
+
         } catch (Exception ex) {
+            if(ex.getMessage().contains("local class incompatible")){
+                JOptionPane.showMessageDialog(null, "Not a compatable File");
+                
+            }
             Logger.getLogger(FolderInformationFile.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -51,17 +72,23 @@ public class FolderInformationFile extends File {
                 Logger.getLogger(FolderInformationFile.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    } 
+    }
 
     //Write the folders to the file
     public void writeToFile() {
+        writeToFile(this);
+    }
+    
+    public void writeToFile(File target){
         FileOutputStream fout = null;
         try {
+            System.out.println("Saving : " + target.getName());
+if(!target.exists()) target.createNewFile();
+            fout = new FileOutputStream(target);
             
-            fout = new FileOutputStream(this);
             ObjectOutputStream rawr = new ObjectOutputStream(fout);
             rawr.writeObject(folders);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(FolderInformationFile.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

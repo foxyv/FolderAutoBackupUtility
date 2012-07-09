@@ -10,9 +10,14 @@
  */
 package folderautobackuputility;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -21,7 +26,7 @@ import javax.swing.JFileChooser;
 public class FolderBackupUI extends javax.swing.JFrame {
 
     final static long serialVersionUID = 124891l;
-    static String FOLDER_CONFIG = "folders.cfg";
+    static String LAST_CONFIG = "lastFolders.fbc";
     FolderInformationFile config = null;
 
     /**
@@ -29,8 +34,17 @@ public class FolderBackupUI extends javax.swing.JFrame {
      */
     public FolderBackupUI() {
         initComponents();
-        reloadFolderList();
-        
+        File lastConfigFile = new File(LAST_CONFIG);
+        if (!lastConfigFile.exists()) {
+            try {
+                lastConfigFile.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        loadLastFolderList(lastConfigFile.getPath());
+
     }
 
     /**
@@ -46,8 +60,16 @@ public class FolderBackupUI extends javax.swing.JFrame {
         folderList = new javax.swing.JList();
         ShowFolderButton = new javax.swing.JButton();
         AddFolderButton = new javax.swing.JButton();
+        RemoveFolderButton = new javax.swing.JButton();
+        ExitButton = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        OpenMenuItem = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("FolderAutoBackupUtility v0.1");
         setBackground(new java.awt.Color(204, 204, 255));
         setResizable(false);
 
@@ -71,6 +93,54 @@ public class FolderBackupUI extends javax.swing.JFrame {
             }
         });
 
+        RemoveFolderButton.setBackground(new java.awt.Color(153, 153, 255));
+        RemoveFolderButton.setFont(new java.awt.Font("Times New Roman", 3, 18)); // NOI18N
+        RemoveFolderButton.setText("Remove Folder");
+        RemoveFolderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RemoveFolderButtonActionPerformed(evt);
+            }
+        });
+
+        ExitButton.setBackground(new java.awt.Color(153, 153, 255));
+        ExitButton.setFont(new java.awt.Font("Times New Roman", 3, 18)); // NOI18N
+        ExitButton.setText("Exit");
+        ExitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ExitButtonActionPerformed(evt);
+            }
+        });
+
+        jMenu1.setText("File");
+
+        OpenMenuItem.setText("Open");
+        OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OpenMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(OpenMenuItem);
+
+        jMenuItem2.setText("Save");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        jMenuItem3.setText("Save As");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -79,7 +149,11 @@ public class FolderBackupUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ShowFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(AddFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(AddFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(RemoveFolderButton, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ExitButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -89,11 +163,15 @@ public class FolderBackupUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(ShowFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
-                        .addComponent(AddFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(AddFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(RemoveFolderButton)
+                            .addComponent(ExitButton))))
                 .addContainerGap())
         );
 
@@ -105,27 +183,30 @@ public class FolderBackupUI extends javax.swing.JFrame {
         if (folderListModel == null) {
             folderListModel = new SortedListModel();
         }
-        
+
         //Initialize a fileChooser
         JFileChooser rawr = new JFileChooser();
-        
+
         //Get a file from the user
         rawr.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         rawr.showDialog(this, "Open");
 
         //Get the folder the user chose
-        VernaFolder folderToAdd = null;
-        folderToAdd = new VernaFolder(rawr.getSelectedFile());
+        VernaFolder folderToAdd = new VernaFolder(rawr.getSelectedFile());
 
         //If the folder exists add it to the folderListModel
         if (folderToAdd != null) {
-            folderToAdd.reloadFileSet();
+            folderToAdd.reloadFolderContents();
             folderListModel.addElement(folderToAdd);
+        }
+
+        if (config == null) {
+            config = new FolderInformationFile(LAST_CONFIG);
         }
 
         //Add the folder to config
         config.addFolder(folderToAdd);
-        
+
         //Update the config file
         config.writeToFile();
 
@@ -137,9 +218,65 @@ public class FolderBackupUI extends javax.swing.JFrame {
     private void ShowFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowFolderButtonActionPerformed
         // TODO add your handling code here:
         VernaFolder folderInQuestion = (VernaFolder) folderList.getSelectedValue();
-        FolderBackupInfo statusScreen = new FolderBackupInfo(folderInQuestion);
-        statusScreen.setVisible(true);
+        if (folderInQuestion != null) {
+            FolderBackupInfo statusScreen = new FolderBackupInfo(folderInQuestion);
+            statusScreen.setVisible(true);
+        }
     }//GEN-LAST:event_ShowFolderButtonActionPerformed
+
+    private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenMenuItemActionPerformed
+
+        //Check to see if the user wants to save this backup information
+        Object[] options = {"Yes", "No", "Cancel"};
+        int choice = (JOptionPane.showOptionDialog(this, "Save before opening?", "Wait!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null));
+        System.out.println(choice);
+        if (choice == 2) {
+            return;
+        }
+        if (choice == 0) {
+            SaveAs();
+        }
+
+        //Initialize a fileChooser
+        JFileChooser rawr = new JFileChooser();
+
+        //Get a file from the user
+        rawr.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        rawr.setCurrentDirectory(new File("./"));
+
+        rawr.setFileFilter(fbc);
+        rawr.showDialog(this, "Open");
+        if (rawr.getSelectedFile() != null) {
+            loadLastFolderList(rawr.getSelectedFile().getAbsolutePath());
+        }
+
+    }//GEN-LAST:event_OpenMenuItemActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        config.writeToFile();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        SaveAs();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void RemoveFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveFolderButtonActionPerformed
+//Check to make sure our folderListModel is initialized
+
+        int choice = JOptionPane.showConfirmDialog(this, "Do you really want to remove this folder from your backup list?");
+
+        if (choice == JOptionPane.OK_OPTION) {
+            config.removeFolder((VernaFolder) folderList.getSelectedValue());
+            folderListModel.removeElement(folderList.getSelectedValue());
+            config.writeToFile();
+        }
+
+    }//GEN-LAST:event_RemoveFolderButtonActionPerformed
+
+    private void ExitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitButtonActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_ExitButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -152,43 +289,101 @@ public class FolderBackupUI extends javax.swing.JFrame {
             }
         });
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddFolderButton;
+    private javax.swing.JButton ExitButton;
+    private javax.swing.JMenuItem OpenMenuItem;
+    private javax.swing.JButton RemoveFolderButton;
     private javax.swing.JButton ShowFolderButton;
     private javax.swing.JList folderList;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
     private SortedListModel folderListModel;
 
-    private void reloadFolderList() {
+    private void loadLastFolderList(String configFilePath) {
         try {
             //Initialize config
-            config = new FolderInformationFile(FOLDER_CONFIG);
-            
+            config = new FolderInformationFile(configFilePath);
+
             //Check to make sure config exists and make a new file if it doesn't
-            if (config.canRead() != true) {
-                config.createNewFile();
+            if (!config.canRead()) {
+                throw new Exception("Could Not Find Folder");
+            } else {
+
+                //Initialize the folder list in config
+                config.readFromFile();
+
+                //Initialize folderListModel
+                folderListModel = new SortedListModel();
+
+                //Copy the folders from config into folderListModel
+                for (VernaFolder aFolder : config.getFolders()) {
+                    folderListModel.addElement(aFolder);
+                }
+
+                //Make sure our folderList's model is set to folderListModel
+                folderList.setModel(folderListModel);
+                System.out.println(config.getFolders());
             }
-            
-            //Initialize the folder list in config
-            config.readFromFile();
-            
-            //Initialize folderListModel
-            folderListModel = new SortedListModel();
-            
-            //Copy the folders from config into folderListModel
-            for(VernaFolder aFolder : config.getFolders()){
-                folderListModel.addElement(aFolder);
-            }
-            
-            //Make sure our folderList's model is set to folderListModel
-            folderList.setModel(folderListModel);
-            System.out.println(config.getFolders());
 
         } catch (Exception ex) {
             Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
+
+    public int SaveAs() {
+        int choice;
+        JFileChooser saveFileChooser = new JFileChooser("./");
+        saveFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        saveFileChooser.setApproveButtonText("Save As");
+        saveFileChooser.setFileFilter(fbc);
+
+        int result = saveFileChooser.showSaveDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            if (saveFileChooser.getSelectedFile().exists()) {
+                Object[] options = {"Yes", "No", "Cancel"};
+                choice = (JOptionPane.showOptionDialog(this, "Overwrite " + saveFileChooser.getSelectedFile().getName() + "?", "Wait!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null));
+
+                if (choice == 0) {
+                    config.writeToFile(saveFileChooser.getSelectedFile());
+                    return 0;
+                }
+                if (choice == 1) {
+                    return SaveAs();
+                }
+                if (choice == 2) {
+                    return -1;
+                }
+            } else {
+                config.writeToFile(saveFileChooser.getSelectedFile());
+                return 0;
+            }
+
+        }
+        return -1;
+    }
+    FileFilter fbc = new FileFilter() {
+
+        @Override
+        public boolean accept(File f) {
+            if (f.getName().endsWith(".fbc")) {
+                return true;
+            }
+            if (f.isDirectory()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String getDescription() {
+            return "FolderBackupConfiguration Files";
+        }
+    };
 }
