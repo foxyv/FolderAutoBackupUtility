@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package folderautobackuputility;
+package folderautobackuputility.View;
 
+import folderautobackuputility.Model.ObjectToStringComparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

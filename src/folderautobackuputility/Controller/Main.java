@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package folderautobackuputility;
+package folderautobackuputility.Controller;
 
+import folderautobackuputility.View.BackupUtilityTrayItem;
+import folderautobackuputility.View.FolderBackupUI;
 import java.awt.AWTException;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -27,7 +29,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             BufferedImage bufferedImage;
-                URI iconURI = Main.class.getResource("/folderautobackuputility/FolderIcon.png").toURI();
+                URI iconURI = Main.class.getResource("/folderautobackuputility/View/FolderIcon.png").toURI();
                 File Image = new File(iconURI);
                 bufferedImage = ImageIO.read(Image);
                 

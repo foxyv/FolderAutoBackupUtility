@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package folderautobackuputility;
+package folderautobackuputility.View;
 
 import java.io.File;
 import java.util.LinkedList;

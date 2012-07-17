@@ -8,8 +8,10 @@
  *
  * Created on May 18, 2012, 1:26:36 PM
  */
-package folderautobackuputility;
+package folderautobackuputility.View;
 
+import folderautobackuputility.Model.FolderTree;
+import folderautobackuputility.Model.VernaFolder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;

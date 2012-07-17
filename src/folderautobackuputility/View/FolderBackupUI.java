@@ -8,23 +8,31 @@
  *
  * Created on May 18, 2012, 1:24:46 PM
  */
-package folderautobackuputility;
+package folderautobackuputility.View;
 
+import folderautobackuputility.Controller.FolderList;
+import folderautobackuputility.Model.FbcFileFilter;
+import folderautobackuputility.Model.VernaFolder;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
+
 
 /**
  *
  * @author Sweord
  */
 public class FolderBackupUI extends javax.swing.JFrame {
-
+    
+    FbcFileFilter fbc = new FbcFileFilter();
+    FolderList config = new FolderList();
+    final static long serialVersionUID = 124891l;
+    final static String LAST_CONFIG = "lastFolders.fbc";
+    File CurrentConfigurationTarget;
+    
     /**
      * Creates new form FolderBackupUI
      */
@@ -178,39 +186,15 @@ public class FolderBackupUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void AddFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddFolderButtonActionPerformed
-        //Check to make sure our folderListModel is initialized
-        if (folderListModel == null) {
-            folderListModel = new SortedListModel();
-        }
-
-        //Initialize a fileChooser
-        JFileChooser rawr = new JFileChooser();
-
-        //Get a file from the user
-        rawr.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        rawr.showDialog(this, "Open");
-
-        //Get the folder the user chose
-        VernaFolder folderToAdd = new VernaFolder(rawr.getSelectedFile());
-
-        //If the folder exists add it to the folderListModel
-        if (folderToAdd != null) {
-            folderToAdd.reloadFolderContents();
-            folderListModel.addElement(folderToAdd);
-        }
-
-        if (config == null) {
-            config = new FolderListSerializer();
-        }
-
-        //Add the folder to config
-        config.addFolder(folderToAdd);
+        
+        
+        config.addFolderDialog(this);
 
         //Update the config file
         config.writeToFile(CurrentConfigurationTarget);
 
         //Make sure the model for folderList is folderListModel
-        folderList.setModel(folderListModel);
+        folderList.setModel(config.getFolderListModel());
 
     }//GEN-LAST:event_AddFolderButtonActionPerformed
 
@@ -236,12 +220,12 @@ public class FolderBackupUI extends javax.swing.JFrame {
             boolean escape = false;
             while (!escape) {
                 switch (config.performSaveAsDialog(this)) {
-                    case FolderListSerializer.SAVE_SUCCESS:
+                    case FolderList.SUCCESS:
 
                         System.out.println("Save Success?");
                         escape = true;
                         break;
-                    case FolderListSerializer.SAVE_CANCELLED:
+                    case FolderList.CANCELLED:
                         System.out.println("Save Cancelled?");
                         return;
 
@@ -309,7 +293,7 @@ public class FolderBackupUI extends javax.swing.JFrame {
         try {
             //Initialize config
             CurrentConfigurationTarget = new File(LAST_CONFIG);
-            config = new FolderListSerializer();
+            config = new FolderList();
             config.readFromFile(CurrentConfigurationTarget);
 
         } catch (Exception ex) {
@@ -342,10 +326,5 @@ public class FolderBackupUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
-    private SortedListModel folderListModel;
-    FbcFileFilter fbc = new FbcFileFilter();
-    final static long serialVersionUID = 124891l;
-    static String LAST_CONFIG = "lastFolders.fbc";
-    static File CurrentConfigurationTarget;
-    FolderListSerializer config = null;
+    
 }

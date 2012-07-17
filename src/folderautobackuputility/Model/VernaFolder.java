@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package folderautobackuputility;
+package folderautobackuputility.Model;
 
 import java.io.File;
 import java.io.Serializable;
@@ -26,25 +26,6 @@ public class VernaFolder implements Serializable {
     private URI FolderURI;
     private String FolderName;
 
-    VernaFolder(File selectedFolder) {
-        try {
-
-            if (selectedFolder.isDirectory()) {
-                FolderURI = selectedFolder.toURI();
-                setFolderName(selectedFolder.getName());
-            } else {
-                Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, selectedFolder.getName() + " is not a folder!");
-            }
-
-
-        }//END OF TRY BLOCK
-        catch (Exception ex) {
-            //System.out.println("Error in VernaFolder(String FolderPath)");
-            Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
-        }//END OF CATCH BLOCK
-    }
-    
-    
 
     public LinkedList<URI> getFileSet() {
         reloadFolderContents();
@@ -105,29 +86,7 @@ public class VernaFolder implements Serializable {
         }
     }
 
-    public VernaFolder(String FolderPath) {
-        try {
-
-            File tempFile = new File(FolderPath);
-
-            if (tempFile.isDirectory()) {
-                System.out.println("Converting to URI and storing folder path");
-                FolderURI = tempFile.toURI();
-                System.out.println(tempFile.getName());
-                setFolderName(tempFile.getName());
-            }
-
-
-            //System.out.println("Constructor done!");
-
-
-        }//END OF TRY BLOCK
-        catch (Exception ex) {
-            //System.out.println("Error in VernaFolder(String FolderPath)");
-            Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
-        }//END OF CATCH BLOCK
-
-    }//END OF "VernaFolder" CONSTRUCTOR
+    
 
     public void outputFilenames() {
         for (URI rawr : fileSet) {
@@ -151,4 +110,49 @@ public class VernaFolder implements Serializable {
     public FileWrapper getFolderFile() {
         return new FileWrapper(this.FolderURI.getPath());
     }
+    
+    
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
+    public VernaFolder(File selectedFolder) {
+        try {
+            
+            if (selectedFolder.isDirectory()) {
+                FolderURI = selectedFolder.toURI();
+                setFolderName(selectedFolder.getName());
+            } else {
+                Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, selectedFolder.getName() + " is not a folder!");
+            }
+            
+            
+        }//END OF TRY BLOCK
+        catch (Exception ex) {
+            //System.out.println("Error in VernaFolder(String FolderPath)");
+            Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
+        }//END OF CATCH BLOCK
+    }
+    public VernaFolder(String FolderPath) {
+        try {
+            
+            File tempFile = new File(FolderPath);
+            
+            if (tempFile.isDirectory()) {
+                System.out.println("Converting to URI and storing folder path");
+                FolderURI = tempFile.toURI();
+                System.out.println(tempFile.getName());
+                setFolderName(tempFile.getName());
+            }
+            
+            
+            //System.out.println("Constructor done!");
+            
+            
+        }//END OF TRY BLOCK
+        catch (Exception ex) {
+            //System.out.println("Error in VernaFolder(String FolderPath)");
+            Logger.getLogger(VernaFolder.class.getName()).log(Level.SEVERE, null, ex);
+        }//END OF CATCH BLOCK
+        
+    }//END OF "VernaFolder" CONSTRUCTOR
+    //</editor-fold>
+    
 }

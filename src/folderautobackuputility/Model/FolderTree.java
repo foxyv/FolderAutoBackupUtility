@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package folderautobackuputility;
+package folderautobackuputility.Model;
 
 import java.net.URI;
 import java.util.concurrent.BlockingQueue;
@@ -20,28 +20,29 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class FolderTree {
 
-    DefaultTreeModel FolderTreeModel;
-    VernaFolder rootFolder = null;
-    FileTreeNode rootNode;
-    ThreadPoolExecutor overallThreadPool;
-    BlockingQueue<Runnable> queue;
+    public DefaultTreeModel FolderTreeModel;
+    public VernaFolder rootFolder = null;
+    public FileTreeNode rootNode;
+    public ThreadPoolExecutor overallThreadPool;
+    private BlockingQueue<Runnable> threadPoolQueue;
     boolean currentlyPopulating = false;
     private boolean populateSubfolders = true;
     boolean changed = false;
-    int maxDepth = 1000;
+    int maxDepth = 1000; //The maximum depth of subfolders to populate (maxDepth = 1 to only populate the root folder)
 
-    private void setNewFolder(VernaFolder newFolder) {
-        if (!newFolder.equals(rootFolder)) {
-            rootFolder = newFolder;
-            initialize();
-        }
-    }
-
+    /**
+     * A folder traversing runnable.
+     * This class is a runnable designed to traverse the current folder's subfolders and
+     * subsequently populate the tree with the files and folders within. 
+     * It will create a new thread for each subfolder and add it to a processing threadPoolQueue.
+     * It will only traverse to a maximum depth as defined by the variable maxDepth.
+     * 
+     */
     private class FolderTraverseRunnable implements Runnable {
 
-        FileTreeNode targetNode;
-        VernaFolder targetFolder;
-        int depth;
+        FileTreeNode targetNode; //The node to populate
+        VernaFolder targetFolder; //The folder to populate the node with
+        int depth; //The depth of our current folder from the root node
 
         public void run() {
 
@@ -54,12 +55,18 @@ public class FolderTree {
 
                 targetNode.add(tempNode);
 
-                if (tempFile.isDirectory() && populateSubfolders && depth <= maxDepth) {
+                //If the target of the new node is a directory and we haven't reached the maxDepth, populate that node with the directory.
+                if (tempFile.isDirectory() && populateSubfolders && depth < maxDepth) {
+                    
+                    
+                    //Create a new folder traveral thread for the subfolder
                     FolderTraverseRunnable traverseSubfolder = new FolderTraverseRunnable();
                     traverseSubfolder.targetFolder = new VernaFolder(tempFile);
                     traverseSubfolder.targetNode = tempNode;
                     traverseSubfolder.depth = depth + 1;
                     Thread newThread = new Thread(traverseSubfolder);
+                    
+                    //Add it to the threadpool
                     overallThreadPool.execute(newThread);
                 }
             }
@@ -67,14 +74,14 @@ public class FolderTree {
                 if (targetNode.getChildCount() == 0) {
                     targetNode.add(new DefaultMutableTreeNode("**EmptyFolder**"));
                 }
-
             }
+        } //End of run override
+        
+    }; //End of class FolderTraverseRunnable
 
-        }
-    };
-
+    
     /**
-     * Uses a queue of threads to traverse a directory's subfolders and index
+     * Uses a threadPoolQueue of threads to traverse a directory's subfolders and index
      * them in a tree.
      *
      */
@@ -82,14 +89,14 @@ public class FolderTree {
         if (checkFolderValidity()) {
             currentlyPopulating = true;
             rootNode = new FileTreeNode((FileWrapper) rootFolder.getFolderFile());
-            queue = new LinkedBlockingQueue<Runnable>();
+            threadPoolQueue = new LinkedBlockingQueue<Runnable>();
 
-            overallThreadPool = new ThreadPoolExecutor(10, 1000, 5, TimeUnit.MINUTES, queue);
+            overallThreadPool = new ThreadPoolExecutor(10, 1000, 5, TimeUnit.MINUTES, threadPoolQueue);
 
             FolderTraverseRunnable traverseFolders = new FolderTraverseRunnable();
             traverseFolders.targetFolder = rootFolder;
             traverseFolders.targetNode = rootNode;
-            traverseFolders.depth = 1;
+            traverseFolders.depth = 1; //Start off at depth 1
 
             Thread newThread = new Thread(traverseFolders);
             overallThreadPool.execute(newThread);
@@ -98,12 +105,11 @@ public class FolderTree {
 
     }
 
-    public void generateDefaultTreeModel() {
-        FolderTreeModel = new DefaultTreeModel(rootNode);
-
-
-    }
-
+    
+    /**
+     * Checks to make sure the target Folder actually exists and isn't a null value.
+     * @return Boolean indicating whether the folder is valid.
+     */
     private boolean checkFolderValidity() {
         if (rootFolder == null) {
             LogSevereError("Null pointer to rootFolder.");
@@ -116,10 +122,16 @@ public class FolderTree {
         return true;
     }
 
+    
+    /**
+     * Logs a severe error with the passed string as it's message.
+     * @param Message Explanation of the error.
+     */
     private static void LogSevereError(String Message) {
         Logger.getLogger(FolderTree.class.getName()).log(Level.SEVERE, Message);
     }
 
+    
     /**
      * Function called by all constructors, rebuilds the tree using the
      * information from rootFolder
@@ -135,12 +147,12 @@ public class FolderTree {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Constructors">
-    FolderTree(VernaFolder rootFolder) {
+    public FolderTree(VernaFolder rootFolder) {
         this.rootFolder = rootFolder;
         initialize();
     }
 
-    FolderTree(VernaFolder rootFolder, boolean populateSubfolders) {
+    public FolderTree(VernaFolder rootFolder, boolean populateSubfolders) {
         this.populateSubfolders = populateSubfolders;
         this.rootFolder = rootFolder;
         initialize();

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package folderautobackuputility;
+package folderautobackuputility.Model;
 
 import java.util.Comparator;
 

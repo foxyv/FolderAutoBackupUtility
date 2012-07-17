@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package folderautobackuputility;
+package folderautobackuputility.Model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,12 +23,12 @@ public class FileTreeNode extends DefaultMutableTreeNode {
     }
 
     public FileTreeNode(FileWrapper userFile) {
-        super();
+        super(userFile.toString());
         aFile = new FileWrapper(userFile.toURI());
     }
 
     public FileTreeNode(FileWrapper userFile, boolean allowsChildren) {
-        super();
+        super(userFile.toString());
         this.setAllowsChildren(allowsChildren);
         aFile = new FileWrapper(userFile.toURI());
     }
