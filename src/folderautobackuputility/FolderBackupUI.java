@@ -25,25 +25,24 @@ import javax.swing.filechooser.FileFilter;
  */
 public class FolderBackupUI extends javax.swing.JFrame {
 
-    final static long serialVersionUID = 124891l;
-    static String LAST_CONFIG = "lastFolders.fbc";
-    FolderInformationFile config = null;
-
     /**
      * Creates new form FolderBackupUI
      */
     public FolderBackupUI() {
         initComponents();
-        File lastConfigFile = new File(LAST_CONFIG);
-        if (!lastConfigFile.exists()) {
+        CurrentConfigurationTarget = new File(LAST_CONFIG);
+
+        //If the file doesn't exist try to make a new one
+        if (!CurrentConfigurationTarget.exists()) {
             try {
-                lastConfigFile.createNewFile();
+                CurrentConfigurationTarget.createNewFile();
             } catch (IOException ex) {
                 Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        loadLastFolderList(lastConfigFile.getPath());
+        loadLastFolderList(CurrentConfigurationTarget.getPath());
+        refreshFolderList();
 
     }
 
@@ -201,14 +200,14 @@ public class FolderBackupUI extends javax.swing.JFrame {
         }
 
         if (config == null) {
-            config = new FolderInformationFile(LAST_CONFIG);
+            config = new FolderListSerializer();
         }
 
         //Add the folder to config
         config.addFolder(folderToAdd);
 
         //Update the config file
-        config.writeToFile();
+        config.writeToFile(CurrentConfigurationTarget);
 
         //Make sure the model for folderList is folderListModel
         folderList.setModel(folderListModel);
@@ -234,7 +233,21 @@ public class FolderBackupUI extends javax.swing.JFrame {
             return;
         }
         if (choice == 0) {
-            SaveAs();
+            boolean escape = false;
+            while (!escape) {
+                switch (config.performSaveAsDialog(this)) {
+                    case FolderListSerializer.SAVE_SUCCESS:
+
+                        System.out.println("Save Success?");
+                        escape = true;
+                        break;
+                    case FolderListSerializer.SAVE_CANCELLED:
+                        System.out.println("Save Cancelled?");
+                        return;
+
+                }
+
+            }
         }
 
         //Initialize a fileChooser
@@ -247,13 +260,15 @@ public class FolderBackupUI extends javax.swing.JFrame {
         rawr.setFileFilter(fbc);
         rawr.showDialog(this, "Open");
         if (rawr.getSelectedFile() != null) {
-            loadLastFolderList(rawr.getSelectedFile().getAbsolutePath());
+            CurrentConfigurationTarget = rawr.getSelectedFile();
+            config.readFromFile(CurrentConfigurationTarget);
+            this.refreshFolderList();
         }
 
     }//GEN-LAST:event_OpenMenuItemActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        config.writeToFile();
+        config.writeToFile(CurrentConfigurationTarget);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -267,8 +282,8 @@ public class FolderBackupUI extends javax.swing.JFrame {
 
         if (choice == JOptionPane.OK_OPTION) {
             config.removeFolder((VernaFolder) folderList.getSelectedValue());
-            folderListModel.removeElement(folderList.getSelectedValue());
-            config.writeToFile();
+            config.writeToFile(CurrentConfigurationTarget);
+            refreshFolderList();
         }
 
     }//GEN-LAST:event_RemoveFolderButtonActionPerformed
@@ -289,6 +304,31 @@ public class FolderBackupUI extends javax.swing.JFrame {
             }
         });
     }
+
+    private void loadLastFolderList(String configFilePath) {
+        try {
+            //Initialize config
+            CurrentConfigurationTarget = new File(LAST_CONFIG);
+            config = new FolderListSerializer();
+            config.readFromFile(CurrentConfigurationTarget);
+
+        } catch (Exception ex) {
+            Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public int SaveAs() {
+        return config.performSaveAsDialog(this);
+    }
+
+    ;
+
+    private void refreshFolderList() {
+        if (config != null) {
+            folderList.setModel(config.getFolderListModel());
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddFolderButton;
     private javax.swing.JButton ExitButton;
@@ -303,87 +343,9 @@ public class FolderBackupUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
     private SortedListModel folderListModel;
-
-    private void loadLastFolderList(String configFilePath) {
-        try {
-            //Initialize config
-            config = new FolderInformationFile(configFilePath);
-
-            //Check to make sure config exists and make a new file if it doesn't
-            if (!config.canRead()) {
-                throw new Exception("Could Not Find Folder");
-            } else {
-
-                //Initialize the folder list in config
-                config.readFromFile();
-
-                //Initialize folderListModel
-                folderListModel = new SortedListModel();
-
-                //Copy the folders from config into folderListModel
-                for (VernaFolder aFolder : config.getFolders()) {
-                    folderListModel.addElement(aFolder);
-                }
-
-                //Make sure our folderList's model is set to folderListModel
-                folderList.setModel(folderListModel);
-                System.out.println(config.getFolders());
-            }
-
-        } catch (Exception ex) {
-            Logger.getLogger(FolderBackupUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-    public int SaveAs() {
-        int choice;
-        JFileChooser saveFileChooser = new JFileChooser("./");
-        saveFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        saveFileChooser.setApproveButtonText("Save As");
-        saveFileChooser.setFileFilter(fbc);
-
-        int result = saveFileChooser.showSaveDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            if (saveFileChooser.getSelectedFile().exists()) {
-                Object[] options = {"Yes", "No", "Cancel"};
-                choice = (JOptionPane.showOptionDialog(this, "Overwrite " + saveFileChooser.getSelectedFile().getName() + "?", "Wait!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null));
-
-                if (choice == 0) {
-                    config.writeToFile(saveFileChooser.getSelectedFile());
-                    return 0;
-                }
-                if (choice == 1) {
-                    return SaveAs();
-                }
-                if (choice == 2) {
-                    return -1;
-                }
-            } else {
-                config.writeToFile(saveFileChooser.getSelectedFile());
-                return 0;
-            }
-
-        }
-        return -1;
-    }
-    FileFilter fbc = new FileFilter() {
-
-        @Override
-        public boolean accept(File f) {
-            if (f.getName().endsWith(".fbc")) {
-                return true;
-            }
-            if (f.isDirectory()) {
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public String getDescription() {
-            return "FolderBackupConfiguration Files";
-        }
-    };
+    FbcFileFilter fbc = new FbcFileFilter();
+    final static long serialVersionUID = 124891l;
+    static String LAST_CONFIG = "lastFolders.fbc";
+    static File CurrentConfigurationTarget;
+    FolderListSerializer config = null;
 }

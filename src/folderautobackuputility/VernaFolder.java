@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.logging.Level;

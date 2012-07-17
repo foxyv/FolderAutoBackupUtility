@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -22,33 +23,37 @@ public class FileTreeNode extends DefaultMutableTreeNode {
     }
 
     public FileTreeNode(FileWrapper userFile) {
-        super(userFile);
+        super();
         aFile = new FileWrapper(userFile.toURI());
     }
 
     public FileTreeNode(FileWrapper userFile, boolean allowsChildren) {
-        super(userFile, allowsChildren);
+        super();
+        this.setAllowsChildren(allowsChildren);
         aFile = new FileWrapper(userFile.toURI());
     }
 
-    public void sortChildren() {
-        ArrayList<FileTreeNode> tempList = new ArrayList<FileTreeNode>();
-
+    /**
+     * Sorts the list using the passed comparator.
+     * @param aComperator A comparator capable of comparing two DefaultMutableTreeNodes.
+     */
+    public void sortChildren(Comparator aComperator) {
+        ArrayList<DefaultMutableTreeNode> tempList = new ArrayList<DefaultMutableTreeNode>();
+        
         for (int x = 0; x < this.getChildCount(); x++) {
-            tempList.add((FileTreeNode) this.getChildAt(x));
+            
+                tempList.add((DefaultMutableTreeNode)this.getChildAt(x));
         }
-        CompareNodes comparator = new CompareNodes();
-        Collections.sort(tempList, comparator);
-
+        Collections.sort(tempList, aComperator);
         this.removeAllChildren();
 
-        for (FileTreeNode a : tempList) {
+        for (DefaultMutableTreeNode a : tempList) {
             this.add(a);
         }
 
     }
 
-    private class CompareNodes implements Comparator<FileTreeNode> {
+    private static class CompareNodes implements Comparator<FileTreeNode> {
 
         public int compare(FileTreeNode o1, FileTreeNode o2) {
             if(o1.aFile.isDirectory() == o2.aFile.isDirectory()){
